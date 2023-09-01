@@ -65,6 +65,16 @@ class EcoSensor(SensorEntity):
         return f"Temp: {self._state_temp}°C, Hum: {self._state_hum}%"
 
     async def async_update(self):
+        async with aiohttp_client.async_get_clientsession(self.hass) as session:
+            try:
+                async with session.get("/type") as response_temp:
+                    if response_temp.status == 200:
+                        _type = await response_temp.text()
+                        if _type == "1":
+                            sensor_dht(self)
+                    else:
+                        _LOGGER.error("Error retrieving the type:: %d", response_temp.status)
+    async def sensor_dht(self):
         """Update the sensor state."""
         url_temp = f"http://{self._sensor['host']}/temp"
         url_hum = f"http://{self._sensor['host']}/hum"
