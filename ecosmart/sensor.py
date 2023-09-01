@@ -67,7 +67,7 @@ class EcoSensor(SensorEntity):
     async def async_update(self):
         async with aiohttp_client.async_get_clientsession(self.hass) as session:
             try:
-                async with session.get("/type") as response_temp:
+                async with session.get(f"{self._sensor['host']}/type") as response_temp:
                     if response_temp.status == 200:
                         _type = await response_temp.text()
                         if _type == "1":
