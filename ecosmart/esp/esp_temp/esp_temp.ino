@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <DHTesp.h>  // Incluimos la nueva biblioteca
+#include <DHTesp.h>  // Incluimos la nueva biblioteca debe instalarla
 
 const char* ssid = "TP-Link_B52E";
 const char* password = "wrooo2023";
