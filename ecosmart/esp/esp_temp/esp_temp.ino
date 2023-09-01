@@ -1,13 +1,16 @@
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <DHTesp.h>  // Incluimos la nueva biblioteca debe instalarla
+#include <DHT.h>
 
 const char* ssid = "TP-Link_B52E";
 const char* password = "wrooo2023";
 
 ESP8266WebServer server(80);
-DHTesp dht;  // Creamos una instancia de la clase DHTesp
+
+#define DHTPIN 5     // Utilizamos el pin D1 (GPIO5) para la conexión del sensor DHT11
+#define DHTTYPE DHT11  // Tipo de sensor: DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   Serial.begin(115200);
@@ -21,8 +24,6 @@ void setup() {
   Serial.println("Conectado a la red WiFi");
   Serial.print("Dirección IP: ");
   Serial.println(WiFi.localIP());
-
-  dht.setup(5, DHTesp::DHT11);  // Configuramos el sensor DHT11
 
   server.on("/", handleRoot);
   server.on("/temp", handleTemperature);
@@ -41,7 +42,7 @@ void handleRoot() {
 }
 
 void handleTemperature() {
-  float temperature = dht.getTemperature();
+  float temperature = dht.readTemperature();
   if (isnan(temperature)) {
     server.send(500, "text/plain", "Error al leer la temperatura");
   } else {
@@ -50,7 +51,7 @@ void handleTemperature() {
 }
 
 void handleHumidity() {
-  float humidity = dht.getHumidity();
+  float humidity = dht.readHumidity();
   if (isnan(humidity)) {
     server.send(500, "text/plain", "Error al leer la humedad");
   } else {
