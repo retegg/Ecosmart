@@ -1,0 +1,9 @@
+{
+    "domain": "ecosmart",
+    "name": "EcoSmart",
+    "version": "1.0",
+    "requirements": [],
+    "iot_class": "assumed_state"
+  
+  }
+  
