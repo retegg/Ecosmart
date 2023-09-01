@@ -94,10 +94,12 @@ class EcoSensor(SensorEntity):
                                 except requests.exceptions.RequestException as ex:
                                     _LOGGER.error("Error during web server request: %s", ex)
                                     self._state_temp = None
-                                    self._state_hum = None
-                            
+                                    self._state_hum = None    
                         elif _type == "2":
                             print("humedad de la tierra")
                     else:
                         _LOGGER.error("Error retrieving the type:: %d", response_temp.status)
-
+            except requests.exceptions.RequestException as ex:
+                                    _LOGGER.error("Error during getting the type: %s", ex)
+                                    self._state_temp = None
+                                    self._state_hum = None  
