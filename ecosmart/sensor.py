@@ -11,7 +11,7 @@ from homeassistant.components.sensor import SensorEntity, PLATFORM_SCHEMA
 import voluptuous as vol
 from homeassistant.helpers import aiohttp_client
 
-_LOGGER = logging.getLogger("ecomsart")
+_LOGGER = logging.getLogger("ecosmart")
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
@@ -19,7 +19,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_HOST): cv.string,
     }
 )
-
 
 def setup_platform(
     hass: HomeAssistant,
@@ -37,7 +36,6 @@ def setup_platform(
     }
 
     add_entities([EcoSensor(sensor)])
-
 
 class EcoSensor(SensorEntity):
     """Representation of a Temperature and Humidity Sensor that queries a web server."""
@@ -67,7 +65,8 @@ class EcoSensor(SensorEntity):
     async def async_update(self):
         async with aiohttp_client.async_get_clientsession(self.hass) as session:
             try:
-                async with session.get(f"{self._sensor['host']}/type") as response_temp:
+                url = f"http://{self._sensor['host']}/type"  # Adjust the URL format as needed
+                async with session.get(url) as response_temp:
                     if response_temp.status == 200:
                         _type = await response_temp.text()
                         if _type == "1":
@@ -102,4 +101,4 @@ class EcoSensor(SensorEntity):
             except requests.exceptions.RequestException as ex:
                                     _LOGGER.error("Error during getting the type: %s", ex)
                                     self._state_temp = None
-                                    self._state_hum = None  
+                                    self._state_hum = None
