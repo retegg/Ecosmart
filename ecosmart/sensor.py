@@ -71,31 +71,33 @@ class EcoSensor(SensorEntity):
                     if response_temp.status == 200:
                         _type = await response_temp.text()
                         if _type == "1":
-                            sensor_dht(self)
+                            """Update the sensor state."""
+                            url_temp = f"http://{self._sensor['host']}/temp"
+                            url_hum = f"http://{self._sensor['host']}/hum"
+                            
+                            async with aiohttp_client.async_get_clientsession(self.hass) as session:
+                                try:
+                                    async with session.get(url_temp) as response_temp:
+                                        if response_temp.status == 200:
+                                            self._state_temp = await response_temp.text()
+                                            _LOGGER.info(f"Temperature updated: {self._state_temp}°C")
+                                        else:
+                                            _LOGGER.error("Error retrieving temperature: %d", response_temp.status)
+                    
+                                    async with session.get(url_hum) as response_hum:
+                                        if response_hum.status == 200:
+                                            self._state_hum = await response_hum.text()
+                                            _LOGGER.info(f"Humidity updated: {self._state_hum}%")
+                                        else:
+                                            _LOGGER.error("Error retrieving humidity: %d", response_hum.status)
+                                
+                                except requests.exceptions.RequestException as ex:
+                                    _LOGGER.error("Error during web server request: %s", ex)
+                                    self._state_temp = None
+                                    self._state_hum = None
+                            
+                        elif _type == "2":
+                            print("humedad de la tierra")
                     else:
                         _LOGGER.error("Error retrieving the type:: %d", response_temp.status)
-    async def sensor_dht(self):
-        """Update the sensor state."""
-        url_temp = f"http://{self._sensor['host']}/temp"
-        url_hum = f"http://{self._sensor['host']}/hum"
-        
-        async with aiohttp_client.async_get_clientsession(self.hass) as session:
-            try:
-                async with session.get(url_temp) as response_temp:
-                    if response_temp.status == 200:
-                        self._state_temp = await response_temp.text()
-                        _LOGGER.info(f"Temperature updated: {self._state_temp}°C")
-                    else:
-                        _LOGGER.error("Error retrieving temperature: %d", response_temp.status)
 
-                async with session.get(url_hum) as response_hum:
-                    if response_hum.status == 200:
-                        self._state_hum = await response_hum.text()
-                        _LOGGER.info(f"Humidity updated: {self._state_hum}%")
-                    else:
-                        _LOGGER.error("Error retrieving humidity: %d", response_hum.status)
-            
-            except requests.exceptions.RequestException as ex:
-                _LOGGER.error("Error during web server request: %s", ex)
-                self._state_temp = None
-                self._state_hum = None
