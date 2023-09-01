@@ -8,4 +8,4 @@ echo "|______\___\___/|___/_| |_| |_|\__,_|_|   \__|"
                                                
 cp -r ./Ecosmart/* ./
 rm -rf ./Ecosmart
-echo "REINICIA HOME ASSISTANT Y"
+echo "REINICIA HOME ASSISTANT"
