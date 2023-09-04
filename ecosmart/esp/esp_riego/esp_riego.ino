@@ -4,7 +4,7 @@
 
 const char* ssid = "TP-Link_B52E";
 const char* password = "wrooo2023";
-int inputPin = 15; // Pin D1 en Wemos D1 Mini
+int inputPin = A0; // Pin D1 en Wemos D1 Mini
 int val = 0;
 
 ESP8266WebServer server(80);
