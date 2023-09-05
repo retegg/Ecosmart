@@ -39,7 +39,7 @@ void handleRoot() {
   server.send(200, "text/plain", String(airQuality));
 }
 void handleType() {
-  server.send(200, "text/plain", "3");// 
+  server.send(200, "text/plain", "3");
 }
 float readAirQuality() {
   float rs = 0;
