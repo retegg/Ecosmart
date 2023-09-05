@@ -27,7 +27,7 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/temp", handleTemperature);
   server.on("/hum", handleHumidity);
-  server.on("/type", handleType)
+  server.on("/type", handleType);
 
   server.begin();
   Serial.println("Servidor iniciado");
@@ -62,5 +62,3 @@ void handleHumidity() {
 void handleType(){
   server.send(200, "text/plain", "1"); // tipo 1 para sensor DHT
 }
-
-  }
