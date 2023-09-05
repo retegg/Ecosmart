@@ -31,7 +31,7 @@ def setup_platform(
     _LOGGER.info(pformat(config))
 
     sensor = {
-        "name": config[CONF_NAME],
+        "name": config.get(CONF_NAME),  # Use .get() to safely retrieve optional config values
         "host": config[CONF_HOST],
     }
 
@@ -42,8 +42,10 @@ class EcoSensor(SensorEntity):
 
     def __init__(self, sensor) -> None:
         """Initialize the EcoSensor."""
+        super().__init__()  # Call the superclass constructor
         self._sensor = sensor
         self._name = sensor["name"]
+        self._state_air = None
         self._state_temp = None
         self._state_hum = None
 
@@ -57,12 +59,8 @@ class EcoSensor(SensorEntity):
         """Return a unique ID for the sensor."""
         return f"eco_sensor_{self._sensor['host']}"
 
-    @property
-    def state(self) -> str | None:
-        """Return the state of the sensor."""
-        return f"Temp: {self._state_temp}°C, Hum: {self._state_hum}%"
-
     async def async_update(self):
+        """Update the sensor's data."""
         async with aiohttp_client.async_get_clientsession(self.hass) as session:
             try:
                 url = f"http://{self._sensor['host']}/type"  # Adjust the URL format as needed
@@ -74,31 +72,47 @@ class EcoSensor(SensorEntity):
                             url_temp = f"http://{self._sensor['host']}/temp"
                             url_hum = f"http://{self._sensor['host']}/hum"
                             
-                            async with aiohttp_client.async_get_clientsession(self.hass) as session:
-                                try:
-                                    async with session.get(url_temp) as response_temp:
-                                        if response_temp.status == 200:
-                                            self._state_temp = await response_temp.text()
-                                            _LOGGER.info(f"Temperature updated: {self._state_temp}°C")
-                                        else:
-                                            _LOGGER.error("Error retrieving temperature: %d", response_temp.status)
-                    
-                                    async with session.get(url_hum) as response_hum:
-                                        if response_hum.status == 200:
-                                            self._state_hum = await response_hum.text()
-                                            _LOGGER.info(f"Humidity updated: {self._state_hum}%")
-                                        else:
-                                            _LOGGER.error("Error retrieving humidity: %d", response_hum.status)
-                                
-                                except requests.exceptions.RequestException as ex:
-                                    _LOGGER.error("Error during web server request: %s", ex)
-                                    self._state_temp = None
-                                    self._state_hum = None    
-                        elif _type == "2":
+                            try:  # Avoid using aiohttp within aiohttp, use regular try/except
+                                async with session.get(url_temp) as response_temp:
+                                    if response_temp.status == 200:
+                                        self._state_temp = await response_temp.text()
+                                        _LOGGER.info(f"Temperature updated: {self._state_temp}°C")
+                                    else:
+                                        _LOGGER.error("Error retrieving temperature: %d", response_temp.status)
+                            
+                                async with session.get(url_hum) as response_hum:
+                                    if response_hum.status == 200:
+                                        self._state_hum = await response_hum.text()
+                                        _LOGGER.info(f"Humidity updated: {self._state_hum}%")
+                                    else:
+                                        _LOGGER.error("Error retrieving humidity: %d", response_hum.status)
+                            except requests.exceptions.RequestException as ex:
+                                _LOGGER.error("Error during web server request: %s", ex)
+                                self._state_temp = None
+                                self._state_hum = None
+                        elif _type == "3":
                             print("humedad de la tierra")
-                    else:
-                        _LOGGER.error("Error retrieving the type:: %d", response_temp.status)
+                        elif _type == "2":
+                            url_sensor = f"http://{self._sensor['host']}/"
+                            async with session.get(url_sensor) as response_air:
+                                if response_air.status == 200:
+                                    self._state_air = await response_air.text()
+                                    _LOGGER.info(f"air updated: {self._state_air}")
+                                else:
+                                    _LOGGER.error("Error retrieving air sensor: %d", response_air.status)
+                        else:
+                            _LOGGER.error("Error retrieving the type: %d", response_temp.status)
             except requests.exceptions.RequestException as ex:
-                                    _LOGGER.error("Error during getting the type: %s", ex)
-                                    self._state_temp = None
-                                    self._state_hum = None
+                _LOGGER.error("Error during getting the type: %s", ex)
+                self._state_temp = None
+                self._state_hum = None
+
+    @property
+    def state(self) -> str | None:
+        """Return the state of the sensor."""
+        if self._state_temp is not None and self._state_hum is not None:
+            return f"Temp: {self._state_temp}°C, Hum: {self._state_hum}%"
+        elif self._state_air is not None:
+            return f"Calidad del aire: {self._state_air}"
+        else:
+            return "Unknown"
