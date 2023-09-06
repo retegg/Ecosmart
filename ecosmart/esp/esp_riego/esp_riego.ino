@@ -28,7 +28,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   server.on("/", handleRoot);
-
+  server.on("/", handleType);
 
   server.begin();
   Serial.println("HTTP server started");
