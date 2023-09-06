@@ -1,45 +1,47 @@
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-
 
 const char* ssid = "TP-Link_B52E";
 const char* password = "wrooo2023";
-int inputPin = A0; // Pin D1 en Wemos D1 Mini
-int val = 0;
 
 ESP8266WebServer server(80);
+const int pin = A0; // Pin analógico al que está conectado el sensor MQ-135
 
-void handleRoot() {
-  server.send(200, "text/plain", String(val));  
-}
 
 void setup() {
-  pinMode(inputPin, INPUT);
   Serial.begin(115200);
+
   WiFi.begin(ssid, password);
-  
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to WiFi...");
+    Serial.println("Conectando a WiFi...");
   }
-  
-  Serial.println("Connected to WiFi");
-  Serial.print("IP address: ");
+
+  Serial.println("Conectado a la red WiFi");
+  Serial.print("Dirección IP: ");
   Serial.println(WiFi.localIP());
 
   server.on("/", handleRoot);
-  server.on("/", handleType);
-
+  server.on("/type", handleType);
   server.begin();
-  Serial.println("HTTP server started");
+  Serial.println("Servidor iniciado");
 }
 
 void loop() {
   server.handleClient();
-  val = analogRead(inputPin);
-  
-
 }
-void handleType(){
-  server.send(200, "text/plain", "2"); // tipo 2 para humedad del riego
+
+void handleRoot() {
+  float water = readAnalog();
+  server.send(200, "text/plain", String(water));
+}
+void handleType() {
+  server.send(200, "text/plain", "2");
+}
+float readAnalog() {
+  float rs = 0;
+  rs = analogRead(pin);
+  delay(100);
+  return rs;
 }
