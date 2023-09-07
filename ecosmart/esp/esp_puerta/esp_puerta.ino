@@ -6,7 +6,7 @@ const char* password = "wrooo2023";
 
 ESP8266WebServer server(80);
 
-const int DIGITAL_PIN = 5; // Usamos D1 como el pin GPIO en el Wemos D1 Mini
+const int DIGITAL_PIN = 5; // Pin digital utilizado para la verificación
 
 void setup() {
   Serial.begin(115200);
@@ -23,7 +23,7 @@ void setup() {
   Serial.print("Dirección IP: ");
   Serial.println(WiFi.localIP());
 
-  server.on("/", handleRoot);
+  server.on("/", HTTP_GET, handleRoot);
 
   server.begin();
   Serial.println("Servidor iniciado");
@@ -38,6 +38,6 @@ void handleRoot() {
   if (pinState == HIGH) {
     server.send(200, "text/plain", "on");
   } else {
-    server.send(200, "text/plain", "off");
+    server.send(200, "text/plain", "OFF");
   }
 }
