@@ -7,10 +7,10 @@ const char* password = "wrooo2023";
 
 ESP8266WebServer server(80);
 const int pin = A0; // Pin analógico
-const int pinValv1 = D3; // Pin al que está conectada la válvula Valv1
-const int pinValv2 = D4; // Pin al que está conectada la válvula Valv2
-const int pinBom1 = 13;  // Pin al que está conectada la bomba Bom1
-const int pinBom2 = 5;  // Pin al que está conectada la bomba Bom2
+const int pinValv1 = 12; // Pin al que está conectada la válvula Valv1
+const int pinValv2 = 14; // Pin al que está conectada la válvula Valv2
+const int pinBom1 = 15;  // Pin al que está conectada la bomba Bom1
+const int pinBom2 = 13;  // Pin al que está conectada la bomba Bom2
 
 void setup() {
   Serial.begin(115200);
@@ -66,32 +66,40 @@ float readAnalog() {
 
 void onValv1() {
   digitalWrite(pinValv1, HIGH);
+  server.send(200, "text/plain", "ok");
 }
 
 void offValv1() {
   digitalWrite(pinValv1, LOW);
+  server.send(200, "text/plain", "ok");
 }
 
 void onValv2() {
   digitalWrite(pinValv2, HIGH);
+  server.send(200, "text/plain", "ok");
 }
 
 void offValv2() {
   digitalWrite(pinValv2, LOW);
+  server.send(200, "text/plain", "ok");
 }
 
 void onBom1() {
   digitalWrite(pinBom1, HIGH);
+  server.send(200, "text/plain", "ok");
 }
 
 void offBom1() {
   digitalWrite(pinBom1, LOW);
+  server.send(200, "text/plain", "ok");
 }
 
 void onBom2() {
   digitalWrite(pinBom2, HIGH);
+  server.send(200, "text/plain", "ok");
 }
 
 void offBom2() {
   digitalWrite(pinBom2, LOW);
+  server.send(200, "text/plain", "ok");
 }
