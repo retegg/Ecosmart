@@ -25,7 +25,7 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/setangle", handleSetAngle);
 
-  myservo.attach(D2);  // Pin D2 utilizado para controlar el servo
+  myservo.attach(D1);  // Pin D2 utilizado para controlar el servo
 
   server.begin();
   Serial.println("Servidor iniciado");
