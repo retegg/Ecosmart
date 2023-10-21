@@ -12,7 +12,7 @@ boolean led_state = true;
 
 void setup() {
   pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT_PULLDOWN); 
+  pinMode(buttonPin, INPUT); 
   digitalWrite(ledPin, HIGH);
 
   Serial.begin(115200);
